@@ -1,40 +1,29 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRoutes = void 0;
 const routes_config_1 = require("../common/routes.config");
+const users_controllers_1 = __importDefault(require("./controller/users.controllers"));
+const users_middleware_1 = __importDefault(require("./middleware/users.middleware"));
+const validation_middleware_1 = __importDefault(require("../common/middleware/validation.middleware"));
+const express_validator_1 = require("express-validator");
+const jwt_middleware_1 = __importDefault(require("../auth/middleware/jwt.middleware"));
 class UserRoutes extends routes_config_1.CommonRoutesConfig {
     constructor(app) {
         super(app, 'UserRoutes');
     }
     configureRoutes() {
-        this.app.route('/users')
-            .get((req, res) => {
-            res.status(200).send("List of users");
-        })
-            .post((req, res) => {
-            res.status(200).send("Post to users");
-        });
-        this.app.route('users/:id')
-            .all((req, res, next) => {
-            next();
-        })
-            .get((req, res) => {
-            res.status(200).send(`get user by id:${req.params.id}`);
-        })
-            .post((req, res) => {
-            res.status(200).send(`post user by id:${req.params.id}`);
-        })
-            .put((req, res) => {
-            res.status(200).send(`put user by id:${req.params.id}`);
-        })
-            .patch((req, res) => {
-            res.status(200).send(`patch user by id:${req.params.id}`);
-        })
-            .delete((req, res) => {
-            res.status(200).send(`delete user by id:${req.params.id}`);
-        });
+        this.app.route('/users/register')
+            .post((0, express_validator_1.body)('username').isString().isLength({ min: 3 }), (0, express_validator_1.body)('email').isEmail(), (0, express_validator_1.body)('password').isLength({ min: 8 }).withMessage('Must include password (8+ characters)'), validation_middleware_1.default.verifyBodyFieldsErrors, users_middleware_1.default.validateSameEmailExists, users_controllers_1.default.createUser);
+        this.app.param(`id`, users_middleware_1.default.extractUserId);
+        this.app.route('/users/:id')
+            .all(jwt_middleware_1.default.validJWTNeeded, users_middleware_1.default.validateUserExists)
+            .get(users_controllers_1.default.getUserById)
+            .delete(jwt_middleware_1.default.validJWTNeeded, users_controllers_1.default.delete);
         return this.app;
     }
 }
 exports.UserRoutes = UserRoutes;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGVzLmNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3VzZXJzL3JvdXRlcy5jb25maWcudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQ0EsMkRBQTREO0FBRTVELE1BQWEsVUFBVyxTQUFRLGtDQUFrQjtJQUM5QyxZQUFZLEdBQXVCO1FBQy9CLEtBQUssQ0FBQyxHQUFHLEVBQUUsWUFBWSxDQUFDLENBQUE7SUFDNUIsQ0FBQztJQUVELGVBQWU7UUFFWCxJQUFJLENBQUMsR0FBRyxDQUFDLEtBQUssQ0FBQyxRQUFRLENBQUM7YUFDbkIsR0FBRyxDQUFDLENBQUMsR0FBbUIsRUFBRSxHQUFvQixFQUFDLEVBQUU7WUFDOUMsR0FBRyxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQUMsQ0FBQyxJQUFJLENBQUMsZUFBZSxDQUFDLENBQUM7UUFDMUMsQ0FBQyxDQUFDO2FBQ0QsSUFBSSxDQUFDLENBQUMsR0FBbUIsRUFBRSxHQUFvQixFQUFDLEVBQUU7WUFDL0MsR0FBRyxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQUMsQ0FBQyxJQUFJLENBQUMsZUFBZSxDQUFDLENBQUM7UUFDMUMsQ0FBQyxDQUFDLENBQUE7UUFFTixJQUFJLENBQUMsR0FBRyxDQUFDLEtBQUssQ0FBQyxXQUFXLENBQUM7YUFDdEIsR0FBRyxDQUFDLENBQUMsR0FBbUIsRUFBRSxHQUFvQixFQUFFLElBQXlCLEVBQUMsRUFBRTtZQUN6RSxJQUFJLEVBQUUsQ0FBQztRQUNYLENBQUMsQ0FBQzthQUNELEdBQUcsQ0FBQyxDQUFDLEdBQW1CLEVBQUUsR0FBb0IsRUFBQyxFQUFFO1lBQzlDLEdBQUcsQ0FBQyxNQUFNLENBQUMsR0FBRyxDQUFDLENBQUMsSUFBSSxDQUFDLGtCQUFrQixHQUFHLENBQUMsTUFBTSxDQUFDLEVBQUUsRUFBRSxDQUFDLENBQUM7UUFDNUQsQ0FBQyxDQUFDO2FBQ0QsSUFBSSxDQUFDLENBQUMsR0FBbUIsRUFBRSxHQUFvQixFQUFDLEVBQUU7WUFDL0MsR0FBRyxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQUMsQ0FBQyxJQUFJLENBQUMsbUJBQW1CLEdBQUcsQ0FBQyxNQUFNLENBQUMsRUFBRSxFQUFFLENBQUMsQ0FBQztRQUM3RCxDQUFDLENBQUM7YUFDRCxHQUFHLENBQUMsQ0FBQyxHQUFtQixFQUFFLEdBQW9CLEVBQUMsRUFBRTtZQUM5QyxHQUFHLENBQUMsTUFBTSxDQUFDLEdBQUcsQ0FBQyxDQUFDLElBQUksQ0FBQyxrQkFBa0IsR0FBRyxDQUFDLE1BQU0sQ0FBQyxFQUFFLEVBQUUsQ0FBQyxDQUFDO1FBQzVELENBQUMsQ0FBQzthQUNELEtBQUssQ0FBQyxDQUFDLEdBQW1CLEVBQUUsR0FBb0IsRUFBQyxFQUFFO1lBQ2hELEdBQUcsQ0FBQyxNQUFNLENBQUMsR0FBRyxDQUFDLENBQUMsSUFBSSxDQUFDLG9CQUFvQixHQUFHLENBQUMsTUFBTSxDQUFDLEVBQUUsRUFBRSxDQUFDLENBQUM7UUFDOUQsQ0FBQyxDQUFDO2FBQ0QsTUFBTSxDQUFDLENBQUMsR0FBbUIsRUFBRSxHQUFvQixFQUFDLEVBQUU7WUFDakQsR0FBRyxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQUMsQ0FBQyxJQUFJLENBQUMscUJBQXFCLEdBQUcsQ0FBQyxNQUFNLENBQUMsRUFBRSxFQUFFLENBQUMsQ0FBQztRQUMvRCxDQUFDLENBQUMsQ0FBQTtRQUdOLE9BQU8sSUFBSSxDQUFDLEdBQUcsQ0FBQTtJQUNuQixDQUFDO0NBRUo7QUF2Q0QsZ0NBdUNDIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGVzLmNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3VzZXJzL3JvdXRlcy5jb25maWcudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQ0EsMkRBQTREO0FBQzVELHVGQUE4RDtBQUM5RCxxRkFBNEQ7QUFDNUQsdUdBQWlGO0FBQ2pGLHlEQUF5QztBQUV6Qyx1RkFBOEQ7QUFFOUQsTUFBYSxVQUFXLFNBQVEsa0NBQWtCO0lBQzlDLFlBQVksR0FBdUI7UUFDL0IsS0FBSyxDQUFDLEdBQUcsRUFBRSxZQUFZLENBQUMsQ0FBQTtJQUM1QixDQUFDO0lBRUQsZUFBZTtRQUVYLElBQUksQ0FBQyxHQUFHLENBQUMsS0FBSyxDQUFDLGlCQUFpQixDQUFDO2FBQzVCLElBQUksQ0FDRCxJQUFBLHdCQUFJLEVBQUMsVUFBVSxDQUFDLENBQUMsUUFBUSxFQUFFLENBQUMsUUFBUSxDQUFDLEVBQUMsR0FBRyxFQUFDLENBQUMsRUFBQyxDQUFDLEVBQzdDLElBQUEsd0JBQUksRUFBQyxPQUFPLENBQUMsQ0FBQyxPQUFPLEVBQUUsRUFDdkIsSUFBQSx3QkFBSSxFQUFDLFVBQVUsQ0FBQyxDQUFDLFFBQVEsQ0FBQyxFQUFDLEdBQUcsRUFBQyxDQUFDLEVBQUMsQ0FBQyxDQUFDLFdBQVcsQ0FBQyx1Q0FBdUMsQ0FBQyxFQUN2RiwrQkFBd0IsQ0FBQyxzQkFBc0IsRUFDL0MsMEJBQWUsQ0FBQyx1QkFBdUIsRUFDdkMsMkJBQWdCLENBQUMsVUFBVSxDQUFDLENBQUE7UUFFcEMsSUFBSSxDQUFDLEdBQUcsQ0FBQyxLQUFLLENBQUMsSUFBSSxFQUFFLDBCQUFlLENBQUMsYUFBYSxDQUFDLENBQUE7UUFFbkQsSUFBSSxDQUFDLEdBQUcsQ0FBQyxLQUFLLENBQUMsWUFBWSxDQUFDO2FBQ3ZCLEdBQUcsQ0FBQyx3QkFBYSxDQUFDLGNBQWMsRUFBQywwQkFBZSxDQUFDLGtCQUFrQixDQUFDO2FBQ3BFLEdBQUcsQ0FBQywyQkFBZ0IsQ0FBQyxXQUFXLENBQUM7YUFDakMsTUFBTSxDQUFDLHdCQUFhLENBQUMsY0FBYyxFQUFFLDJCQUFnQixDQUFDLE1BQU0sQ0FBQyxDQUFBO1FBR2xFLE9BQU8sSUFBSSxDQUFDLEdBQUcsQ0FBQTtJQUNuQixDQUFDO0NBRUo7QUEzQkQsZ0NBMkJDIn0=

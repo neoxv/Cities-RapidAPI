@@ -1,5 +1,11 @@
 import express,{ Application } from "express";
 import { CommonRoutesConfig } from "../common/routes.config"
+import UsersControllers from "./controller/users.controllers";
+import UsersMiddleware from "./middleware/users.middleware";
+import BodyValidationMiddleware from '../common/middleware/validation.middleware'
+import { body } from "express-validator";
+import AuthMiddleware from "../auth/middleware/auth.middleware";
+import JwtMiddleware from "../auth/middleware/jwt.middleware";
 
 export class UserRoutes extends CommonRoutesConfig{
     constructor(app:express.Application){
@@ -8,33 +14,21 @@ export class UserRoutes extends CommonRoutesConfig{
 
     configureRoutes(): Application {
 
-        this.app.route('/users')
-            .get((req:express.Request, res:express.Response)=>{
-                res.status(200).send("List of users");
-            })
-            .post((req:express.Request, res:express.Response)=>{
-                res.status(200).send("Post to users");
-            })
+        this.app.route('/users/register')
+            .post(
+                body('username').isString().isLength({min:3}),
+                body('email').isEmail(),
+                body('password').isLength({min:8}).withMessage('Must include password (8+ characters)'),
+                BodyValidationMiddleware.verifyBodyFieldsErrors,
+                UsersMiddleware.validateSameEmailExists,
+                UsersControllers.createUser)
+                
+        this.app.param(`id`, UsersMiddleware.extractUserId)
         
-        this.app.route('users/:id')
-            .all((req:express.Request, res:express.Response, next:express.NextFunction)=>{
-                next();
-            })
-            .get((req:express.Request, res:express.Response)=>{
-                res.status(200).send(`get user by id:${req.params.id}`);
-            })
-            .post((req:express.Request, res:express.Response)=>{
-                res.status(200).send(`post user by id:${req.params.id}`);
-            })
-            .put((req:express.Request, res:express.Response)=>{
-                res.status(200).send(`put user by id:${req.params.id}`);
-            })
-            .patch((req:express.Request, res:express.Response)=>{
-                res.status(200).send(`patch user by id:${req.params.id}`);
-            })
-            .delete((req:express.Request, res:express.Response)=>{
-                res.status(200).send(`delete user by id:${req.params.id}`);
-            })
+        this.app.route('/users/:id')
+            .all(JwtMiddleware.validJWTNeeded,UsersMiddleware.validateUserExists)
+            .get(UsersControllers.getUserById)
+            .delete(JwtMiddleware.validJWTNeeded, UsersControllers.delete)
 
 
         return this.app
