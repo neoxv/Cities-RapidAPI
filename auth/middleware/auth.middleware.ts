@@ -16,7 +16,7 @@ class AuthMiddleware{
                 return next();
             }
         }
-        res.status(400).send({ errors: ['Invalid email and/or password'] });
+        res.status(400).send({ errors: [{msg:'Invalid email and/or password'}] });
     }
 }
 

@@ -9,12 +9,21 @@ const express_validator_1 = require("express-validator");
 const validation_middleware_1 = __importDefault(require("../common/middleware/validation.middleware"));
 const auth_middleware_1 = __importDefault(require("./middleware/auth.middleware"));
 const auth_controller_1 = __importDefault(require("./controllers/auth.controller"));
-const jwt_middleware_1 = __importDefault(require("./middleware/jwt.middleware"));
+const users_middleware_1 = __importDefault(require("../users/middleware/users.middleware"));
+const users_controllers_1 = __importDefault(require("../users/controller/users.controllers"));
 class AuthRoutes extends routes_config_1.CommonRoutesConfig {
     constructor(app) {
         super(app, 'AuthRoutes');
     }
     configureRoutes() {
+        this.app.post('/auth/register', [
+            (0, express_validator_1.body)('username').isString().isLength({ min: 3 }),
+            (0, express_validator_1.body)('email').isEmail(),
+            (0, express_validator_1.body)('password').isLength({ min: 6 }).withMessage('Password must include(6+ characters)'),
+            validation_middleware_1.default.verifyBodyFieldsErrors,
+            users_middleware_1.default.validateSameEmailExists,
+            users_controllers_1.default.createUser
+        ]);
         this.app.post('/auth/login', [
             (0, express_validator_1.body)('email').isEmail(),
             (0, express_validator_1.body)('password').isString(),
@@ -22,14 +31,14 @@ class AuthRoutes extends routes_config_1.CommonRoutesConfig {
             auth_middleware_1.default.verifyUserPassword,
             auth_controller_1.default.createJWT
         ]);
-        this.app.post('/auth/refresh-token', [
-            jwt_middleware_1.default.validJWTNeeded,
-            jwt_middleware_1.default.verifyRefreshBodyField,
-            jwt_middleware_1.default.validRefreshNeeded,
-            auth_controller_1.default.createJWT,
-        ]);
+        // this.app.post('/auth/refresh-token',[
+        //     JwtMiddleware.validJWTNeeded,
+        //     JwtMiddleware.verifyRefreshBodyField,
+        //     JwtMiddleware.validRefreshNeeded,
+        //     AuthController.createJWT,
+        // ])
         return this.app;
     }
 }
 exports.AuthRoutes = AuthRoutes;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGVzLmNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL2F1dGgvcm91dGVzLmNvbmZpZy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7QUFDQSwyREFBNkQ7QUFDN0QseURBQXlDO0FBQ3pDLHVHQUFpRjtBQUNqRixtRkFBeUQ7QUFDekQsb0ZBQTBEO0FBRTFELGlGQUF3RDtBQUV4RCxNQUFhLFVBQVcsU0FBUSxrQ0FBa0I7SUFDOUMsWUFBWSxHQUF1QjtRQUMvQixLQUFLLENBQUMsR0FBRyxFQUFFLFlBQVksQ0FBQyxDQUFBO0lBQzVCLENBQUM7SUFFRCxlQUFlO1FBQ1gsSUFBSSxDQUFDLEdBQUcsQ0FBQyxJQUFJLENBQUMsYUFBYSxFQUFDO1lBQ3hCLElBQUEsd0JBQUksRUFBQyxPQUFPLENBQUMsQ0FBQyxPQUFPLEVBQUU7WUFDdkIsSUFBQSx3QkFBSSxFQUFDLFVBQVUsQ0FBQyxDQUFDLFFBQVEsRUFBRTtZQUMzQiwrQkFBd0IsQ0FBQyxzQkFBc0I7WUFDL0MseUJBQWMsQ0FBQyxrQkFBa0I7WUFDakMseUJBQWMsQ0FBQyxTQUFTO1NBQzNCLENBQUMsQ0FBQTtRQUVGLElBQUksQ0FBQyxHQUFHLENBQUMsSUFBSSxDQUFDLHFCQUFxQixFQUFDO1lBQ2hDLHdCQUFhLENBQUMsY0FBYztZQUM1Qix3QkFBYSxDQUFDLHNCQUFzQjtZQUNwQyx3QkFBYSxDQUFDLGtCQUFrQjtZQUNoQyx5QkFBYyxDQUFDLFNBQVM7U0FDM0IsQ0FBQyxDQUFBO1FBQ0YsT0FBTyxJQUFJLENBQUMsR0FBRyxDQUFBO0lBQ25CLENBQUM7Q0FFSjtBQXZCRCxnQ0F1QkMifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGVzLmNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL2F1dGgvcm91dGVzLmNvbmZpZy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7QUFDQSwyREFBNkQ7QUFDN0QseURBQXlDO0FBQ3pDLHVHQUFpRjtBQUNqRixtRkFBeUQ7QUFDekQsb0ZBQTBEO0FBRzFELDRGQUFtRTtBQUNuRSw4RkFBcUU7QUFFckUsTUFBYSxVQUFXLFNBQVEsa0NBQWtCO0lBQzlDLFlBQVksR0FBdUI7UUFDL0IsS0FBSyxDQUFDLEdBQUcsRUFBRSxZQUFZLENBQUMsQ0FBQTtJQUM1QixDQUFDO0lBRUQsZUFBZTtRQUNYLElBQUksQ0FBQyxHQUFHLENBQUMsSUFBSSxDQUFDLGdCQUFnQixFQUFDO1lBQzNCLElBQUEsd0JBQUksRUFBQyxVQUFVLENBQUMsQ0FBQyxRQUFRLEVBQUUsQ0FBQyxRQUFRLENBQUMsRUFBQyxHQUFHLEVBQUMsQ0FBQyxFQUFDLENBQUM7WUFDN0MsSUFBQSx3QkFBSSxFQUFDLE9BQU8sQ0FBQyxDQUFDLE9BQU8sRUFBRTtZQUN2QixJQUFBLHdCQUFJLEVBQUMsVUFBVSxDQUFDLENBQUMsUUFBUSxDQUFDLEVBQUMsR0FBRyxFQUFDLENBQUMsRUFBQyxDQUFDLENBQUMsV0FBVyxDQUFDLHNDQUFzQyxDQUFDO1lBQ3RGLCtCQUF3QixDQUFDLHNCQUFzQjtZQUMvQywwQkFBZSxDQUFDLHVCQUF1QjtZQUN2QywyQkFBZ0IsQ0FBQyxVQUFVO1NBQUMsQ0FBQyxDQUFBO1FBRWpDLElBQUksQ0FBQyxHQUFHLENBQUMsSUFBSSxDQUFDLGFBQWEsRUFBQztZQUN4QixJQUFBLHdCQUFJLEVBQUMsT0FBTyxDQUFDLENBQUMsT0FBTyxFQUFFO1lBQ3ZCLElBQUEsd0JBQUksRUFBQyxVQUFVLENBQUMsQ0FBQyxRQUFRLEVBQUU7WUFDM0IsK0JBQXdCLENBQUMsc0JBQXNCO1lBQy9DLHlCQUFjLENBQUMsa0JBQWtCO1lBQ2pDLHlCQUFjLENBQUMsU0FBUztTQUMzQixDQUFDLENBQUE7UUFFRix3Q0FBd0M7UUFDeEMsb0NBQW9DO1FBQ3BDLDRDQUE0QztRQUM1Qyx3Q0FBd0M7UUFDeEMsZ0NBQWdDO1FBQ2hDLEtBQUs7UUFDTCxPQUFPLElBQUksQ0FBQyxHQUFHLENBQUE7SUFDbkIsQ0FBQztDQUVKO0FBL0JELGdDQStCQyJ9

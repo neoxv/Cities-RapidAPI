@@ -1,0 +1,54 @@
+.App {
+
+}
+
+.Auth-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background: hsla(217, 100%, 50%, 1);
+    background: linear-gradient(90deg, hsla(217, 100%, 50%, 1) 0%, hsla(186, 100%, 69%, 1) 100%);
+    background: -moz-linear-gradient(90deg, hsla(217, 100%, 50%, 1) 0%, hsla(186, 100%, 69%, 1) 100%);
+    background: -webkit-linear-gradient(90deg, hsla(217, 100%, 50%, 1) 0%, hsla(186, 100%, 69%, 1) 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient(startColorstr="#0061FF", endColorstr="#60EFFF", GradientType=1);
+}
+
+.Auth-form {
+    width: 420px;
+    box-shadow:
+            2.8px 2.8px 2.2px rgba(0, 0, 0, 0.056),
+            6.7px 6.7px 5.3px rgba(0, 0, 0, 0.081),
+            12.5px 12.5px 10px rgba(0, 0, 0, 0.1),
+            22.3px 22.3px 17.9px rgba(0, 0, 0, 0.119),
+            41.8px 41.8px 33.4px rgba(0, 0, 0, 0.144),
+            100px 100px 80px rgba(0, 0, 0, 0.2);
+    padding-top: 30px;
+    padding-bottom: 20px;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.Auth-form-content {
+    padding-left: 12%;
+    padding-right: 12%;
+}
+
+.Auth-form-title {
+    text-align: center;
+    margin-bottom: 1em;
+    font-size: 24px;
+    color: rgb(34, 34, 34);
+    font-weight: 800;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(34, 34, 34);
+}
+
+.link-primary{
+    cursor: pointer;
+}

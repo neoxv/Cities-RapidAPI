@@ -10,7 +10,7 @@ class UsersMiddleware{
         if(user){
             next();
         }else{
-            res.status(400).send({error: `User ${req.params.id} not found`})
+            res.status(400).send({errors: [{msg:`User ${req.params.id} not found`}]})
         }
     }
 
@@ -19,7 +19,7 @@ class UsersMiddleware{
         if(!user){
             next();
         }else{
-            res.status(400).send({error: `User email already exists`})
+            res.status(400).send({errors:[{msg:`User email already exists`}] })
         }
     }
 

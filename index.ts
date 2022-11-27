@@ -9,10 +9,9 @@ import {CommonRoutesConfig} from './common/routes.config';
 import {UserRoutes} from './users/routes.config';
 import dotenv from 'dotenv'
 import { AuthRoutes } from './auth/routes.config';
+import { CitiesRoutes } from './cities/routes.config';
 
 dotenv.config();
-
-console.log(process.env.JWT_SECRET)
 
 const app:express.Application = express()
 const server:http.Server = http.createServer(app)
@@ -39,6 +38,7 @@ if(!process.env.DEBUG){
 app.use(expressWinston.logger(loggerOptions))
 routes.push(new AuthRoutes(app))
 routes.push(new UserRoutes(app));
+routes.push(new CitiesRoutes(app));
 
 const runningMessage = `Server running at http://localhost:${port}`
 
